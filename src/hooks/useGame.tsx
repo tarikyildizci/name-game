@@ -1,21 +1,12 @@
 // to fix a speech recognition bug
 // recommended by library author
 import 'regenerator-runtime'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
 import config from '../config'
 import { TimerStopReason, useWait } from './useWait'
-import {
-  GAME_OVER_REASONS,
-  getRandomWord,
-  getWordWithFirstLetter,
-  isWordValid,
-  NameObjectType,
-  randRange,
-  speak,
-} from '../util'
-
-type PlayerType = 'cpu' | 'player'
+import { getRandomWord, getWordWithFirstLetter, isWordValid, randRange, speak } from '../util'
+import { GAME_OVER_REASONS, NameObjectType, PlayerType } from '../types'
 
 type StateType = {
   turn: PlayerType
@@ -96,15 +87,18 @@ const useGame = (indexedNames: NameObjectType) => {
 
   const { start: startTimer, stop: stopTimer, timeLeft } = useWait(onTimerStopped)
 
-  const startGame = (names: Array<string>) => {
-    const starterName = getRandomWord(names)
-    speak(starterName)
-    setState({ turn: 'player', latestName: starterName, usedNames: [starterName] })
-  }
+  const startGame = useCallback(
+    (names: Array<string>) => {
+      const starterName = getRandomWord(names)
+      speak(starterName)
+      setState({ turn: 'player', latestName: starterName, usedNames: [starterName] })
+    },
+    [setState],
+  )
 
-  const listenToPlayer = () => {
+  const listenToPlayer = useCallback(() => {
     SpeechRecognition.startListening({ language: 'tr-TR' })
-  }
+  }, [SpeechRecognition])
 
   useEffect(() => {
     if (!latestName) {

@@ -1,5 +1,5 @@
 import React from 'react'
-import { GAME_OVER_REASONS } from '../util'
+import { GAME_OVER_REASONS } from '../types'
 import './styles.css'
 
 type GameOverProps = {
